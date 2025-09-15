@@ -272,7 +272,7 @@ export const HomePage = () => {
             Start conversations with our AI assistant and discover insights about groundwater 
             resources across India's assessment units.
           </p>
-          <button className="bg-white text-blue-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto">
+          <button style={{backgroundColor: 'white'}} className="text-blue-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto">
             <MessageSquare className="w-5 h-5" />
             <span>Launch ChatBOT</span>
             <ArrowRight className="w-5 h-5" />
