@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Database, BarChart3, Globe, MessageSquare, Users, Zap, ArrowRight, Menu, X } from 'lucide-react';
 
 export const HomePage = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -65,7 +67,9 @@ export const HomePage = () => {
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors">Features</a>
               <a href="#about" className="text-gray-700 hover:text-blue-600 transition-colors">About</a>
               <a href="#contact" className="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
-              <button className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-2 rounded-full hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105">
+              <button 
+                onClick={() => navigate('/chat')}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-2 rounded-full hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105">
                 Try ChatBOT
               </button>
             </div>
@@ -86,7 +90,9 @@ export const HomePage = () => {
               <a href="#features" className="block text-gray-700 hover:text-blue-600">Features</a>
               <a href="#about" className="block text-gray-700 hover:text-blue-600">About</a>
               <a href="#contact" className="block text-gray-700 hover:text-blue-600">Contact</a>
-              <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-3 rounded-full">
+              <button 
+                onClick={() => navigate('/chat')}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-3 rounded-full">
                 Try ChatBOT
               </button>
             </div>
@@ -117,7 +123,9 @@ export const HomePage = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
+              <button
+                onClick={() => navigate('/chat')}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
                 <MessageSquare className="w-5 h-5" />
                 <span>Start Chatting</span>
                 <ArrowRight className="w-5 h-5" />
@@ -272,7 +280,10 @@ export const HomePage = () => {
             Start conversations with our AI assistant and discover insights about groundwater 
             resources across India's assessment units.
           </p>
-          <button style={{backgroundColor: 'white'}} className="text-blue-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto">
+          <button 
+            onClick={() => navigate('/chat')}
+            style={{backgroundColor: 'white'}} 
+            className="text-blue-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2 mx-auto">
             <MessageSquare className="w-5 h-5" />
             <span>Launch ChatBOT</span>
             <ArrowRight className="w-5 h-5" />
