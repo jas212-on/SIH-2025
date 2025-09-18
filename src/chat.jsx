@@ -1,5 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './chat.css';
+import { 
+  FaPaperclip, 
+  FaMicrophone, 
+  FaCamera,
+  FaBars,
+  FaUser,
+  FaRobot,
+  FaTrash
+} from "react-icons/fa";
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState([
@@ -14,7 +23,7 @@ export const ChatPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [quickQueriesVisible, setQuickQueriesVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [hasUserTyped, setHasUserTyped] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -68,32 +77,19 @@ export const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (messagesContainerRef.current) {
-        const currentScrollY = messagesContainerRef.current.scrollTop;
-        
-        if (currentScrollY > lastScrollY && currentScrollY > 100) {
-          // Scrolling down
-          setQuickQueriesVisible(false);
-        } else if (currentScrollY < lastScrollY) {
-          // Scrolling up
-          setQuickQueriesVisible(true);
-        }
-        
-        setLastScrollY(currentScrollY);
-      }
-    };
-
-    const messagesContainer = messagesContainerRef.current;
-    if (messagesContainer) {
-      messagesContainer.addEventListener('scroll', handleScroll);
-      return () => messagesContainer.removeEventListener('scroll', handleScroll);
-    }
-  }, [lastScrollY]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputMessage(value);
+    
+    // Hide quick queries when user starts typing
+    if (value.trim() && !hasUserTyped) {
+      setHasUserTyped(true);
+      setQuickQueriesVisible(false);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -108,6 +104,10 @@ export const ChatPage = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsTyping(true);
+    
+    // Hide quick queries after sending message
+    setQuickQueriesVisible(false);
+    setHasUserTyped(true);
 
     // Simulate API call delay
     setTimeout(() => {
@@ -123,6 +123,29 @@ export const ChatPage = () => {
 
   const handleQuickQuery = (query) => {
     setInputMessage(query);
+    setQuickQueriesVisible(false);
+    setHasUserTyped(true);
+    
+    // Auto-send the quick query
+    const userMessage = {
+      type: 'user',
+      content: query,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    // Simulate API call delay
+    setTimeout(() => {
+      const botResponse = {
+        type: 'bot',
+        content: `Here's information about: "${query}". This is where I would process your query and provide relevant groundwater data. The actual AI integration will be implemented separately.`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botResponse]);
+      setIsTyping(false);
+    }, 2000);
   };
 
   const handleFileUpload = (event) => {
@@ -135,6 +158,8 @@ export const ChatPage = () => {
         isFile: true
       };
       setMessages(prev => [...prev, fileMessage]);
+      setQuickQueriesVisible(false);
+      setHasUserTyped(true);
     }
   };
 
@@ -144,6 +169,15 @@ export const ChatPage = () => {
       content: 'Chat cleared. How can I help you with groundwater data today?',
       timestamp: new Date()
     }]);
+    setQuickQueriesVisible(true);
+    setHasUserTyped(false);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   return (
@@ -156,7 +190,7 @@ export const ChatPage = () => {
               className="menu-btn interactive"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              ☰
+              <FaBars />
             </button>
             <div className="logo-section">
               <div className="logo-icon">🌊</div>
@@ -177,7 +211,7 @@ export const ChatPage = () => {
               ))}
             </select>
             <div className="profile-photo">
-              👤
+              <FaUser />
             </div>
           </div>
         </div>
@@ -204,7 +238,7 @@ export const ChatPage = () => {
               <h3>Chat Actions</h3>
               <div className="action-buttons">
                 <button className="action-btn" onClick={clearChat}>
-                  🗑️ Clear Chat
+                  <FaTrash /> Clear Chat
                 </button>
               </div>
             </div>
@@ -213,21 +247,23 @@ export const ChatPage = () => {
 
         {/* Main Chat Area */}
         <main className="chat-main">
-          {/* Quick Query Buttons */}
-          <div className={`quick-queries-section ${!quickQueriesVisible ? 'hidden' : ''}`}>
-            <h3>Quick Queries</h3>
-            <div className="quick-queries-grid">
-              {quickQueries.map((query, index) => (
-                <button 
-                  key={index}
-                  className="quick-query-btn"
-                  onClick={() => handleQuickQuery(query)}
-                >
-                  {query}
-                </button>
-              ))}
+          {/* Quick Query Buttons - Only show initially */}
+          {quickQueriesVisible && !hasUserTyped && (
+            <div className="quick-queries-section">
+              <h3>Quick Queries</h3>
+              <div className="quick-queries-grid">
+                {quickQueries.map((query, index) => (
+                  <button 
+                    key={index}
+                    className="quick-query-btn"
+                    onClick={() => handleQuickQuery(query)}
+                  >
+                    {query}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Messages Container */}
           <div className="messages-container" ref={messagesContainerRef}>
@@ -237,7 +273,7 @@ export const ChatPage = () => {
                 className={`message ${message.type === 'user' ? 'user-message' : 'bot-message'}`}
               >
                 <div className="message-avatar">
-                  {message.type === 'user' ? '👤' : '🤖'}
+                  {message.type === 'user' ? <FaUser /> : <FaRobot />}
                 </div>
                 <div className="message-content">
                   <div className="message-bubble">
@@ -258,7 +294,7 @@ export const ChatPage = () => {
             
             {isTyping && (
               <div className="message bot-message">
-                <div className="message-avatar">🤖</div>
+                <div className="message-avatar"><FaRobot /></div>
                 <div className="message-content">
                   <div className="message-bubble typing-indicator">
                     <div className="typing-dots">
@@ -283,20 +319,20 @@ export const ChatPage = () => {
                   onClick={() => fileInputRef.current?.click()}
                   title="Upload file"
                 >
-                  📎
+                  <FaPaperclip />
                 </button>
                 <button className="feature-btn interactive" title="Voice input">
-                  🎤
+                  <FaMicrophone />
                 </button>
                 <button className="feature-btn interactive" title="Camera">
-                  📷
+                  <FaCamera />
                 </button>
               </div>
               <input
                 type="text"
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
                 placeholder="Ask me about groundwater data, assessments, or any INGRES related queries..."
                 className="message-input"
               />
@@ -307,11 +343,6 @@ export const ChatPage = () => {
               >
                 ➤
               </button>
-            </div>
-            <div className="input-features-info">
-              <div className="feature-info">
-                <span>Powered by INGRES AI • Multilingual Support • Real-time Data Access</span>
-              </div>
             </div>
           </div>
         </main>
