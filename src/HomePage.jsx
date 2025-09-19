@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Database, BarChart3, Globe, MessageSquare, Users, Zap, ArrowRight, Menu, X } from 'lucide-react';
 
-export const HomePage = () => {
+const HomePage = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { FaPaperclip, FaMicrophone, FaCamera, FaPaperPlane } from 'react-icons/fa';
 import './chat.css';
 
 export const ChatPage = () => {
@@ -13,8 +14,8 @@ export const ChatPage = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [quickQueriesVisible, setQuickQueriesVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showQuickQueries, setShowQuickQueries] = useState(true);
+  const [hasUserTyped, setHasUserTyped] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -68,32 +69,19 @@ export const ChatPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (messagesContainerRef.current) {
-        const currentScrollY = messagesContainerRef.current.scrollTop;
-        
-        if (currentScrollY > lastScrollY && currentScrollY > 100) {
-          // Scrolling down
-          setQuickQueriesVisible(false);
-        } else if (currentScrollY < lastScrollY) {
-          // Scrolling up
-          setQuickQueriesVisible(true);
-        }
-        
-        setLastScrollY(currentScrollY);
-      }
-    };
-
-    const messagesContainer = messagesContainerRef.current;
-    if (messagesContainer) {
-      messagesContainer.addEventListener('scroll', handleScroll);
-      return () => messagesContainer.removeEventListener('scroll', handleScroll);
-    }
-  }, [lastScrollY]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputMessage(value);
+    
+    // Hide quick queries if user starts typing their own query
+    if (value.trim() && !hasUserTyped) {
+      setHasUserTyped(true);
+      setShowQuickQueries(false);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -108,6 +96,10 @@ export const ChatPage = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsTyping(true);
+    
+    // Hide quick queries after sending any message
+    setShowQuickQueries(false);
+    setHasUserTyped(true);
 
     // Simulate API call delay
     setTimeout(() => {
@@ -123,6 +115,8 @@ export const ChatPage = () => {
 
   const handleQuickQuery = (query) => {
     setInputMessage(query);
+    setShowQuickQueries(false);
+    setHasUserTyped(true);
   };
 
   const handleFileUpload = (event) => {
@@ -135,6 +129,8 @@ export const ChatPage = () => {
         isFile: true
       };
       setMessages(prev => [...prev, fileMessage]);
+      setShowQuickQueries(false);
+      setHasUserTyped(true);
     }
   };
 
@@ -144,6 +140,8 @@ export const ChatPage = () => {
       content: 'Chat cleared. How can I help you with groundwater data today?',
       timestamp: new Date()
     }]);
+    setShowQuickQueries(true);
+    setHasUserTyped(false);
   };
 
   return (
@@ -213,21 +211,23 @@ export const ChatPage = () => {
 
         {/* Main Chat Area */}
         <main className="chat-main">
-          {/* Quick Query Buttons */}
-          <div className={`quick-queries-section ${!quickQueriesVisible ? 'hidden' : ''}`}>
-            <h3>Quick Queries</h3>
-            <div className="quick-queries-grid">
-              {quickQueries.map((query, index) => (
-                <button 
-                  key={index}
-                  className="quick-query-btn"
-                  onClick={() => handleQuickQuery(query)}
-                >
-                  {query}
-                </button>
-              ))}
+          {/* Quick Query Buttons - Only show at start */}
+          {showQuickQueries && (
+            <div className="quick-queries-section">
+              <h3>Quick Queries</h3>
+              <div className="quick-queries-grid">
+                {quickQueries.map((query, index) => (
+                  <button 
+                    key={index}
+                    className="quick-query-btn"
+                    onClick={() => handleQuickQuery(query)}
+                  >
+                    {query}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Messages Container */}
           <div className="messages-container" ref={messagesContainerRef}>
@@ -283,19 +283,19 @@ export const ChatPage = () => {
                   onClick={() => fileInputRef.current?.click()}
                   title="Upload file"
                 >
-                  📎
+                  <FaPaperclip size={50} color='black' />
                 </button>
                 <button className="feature-btn interactive" title="Voice input">
-                  🎤
+                  <FaMicrophone size={50} color='black' />
                 </button>
                 <button className="feature-btn interactive" title="Camera">
-                  📷
+                  <FaCamera size={50} color='black'/>
                 </button>
               </div>
               <input
                 type="text"
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
+                onChange={handleInputChange}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder="Ask me about groundwater data, assessments, or any INGRES related queries..."
                 className="message-input"
@@ -305,13 +305,8 @@ export const ChatPage = () => {
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim()}
               >
-                ➤
+                <FaPaperPlane size={50} color='black'/>
               </button>
-            </div>
-            <div className="input-features-info">
-              <div className="feature-info">
-                <span>Powered by INGRES AI • Multilingual Support • Real-time Data Access</span>
-              </div>
             </div>
           </div>
         </main>
@@ -328,3 +323,5 @@ export const ChatPage = () => {
     </div>
   );
 };
+
+export default ChatPage;
