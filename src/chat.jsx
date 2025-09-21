@@ -35,7 +35,9 @@ export const ChatPage = () => {
     "Historical data for Tamil Nadu",
     "Recharge estimation methodology",
     "Over-exploited areas in Punjab",
-    "Groundwater quality assessment"
+    "Groundwater quality assessment",
+    "Groundwater quality in Kerala",
+    "Current assessment in Rajasthan"
   ];
 
   const categories = [
