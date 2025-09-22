@@ -161,46 +161,88 @@
   letter-spacing: 0.5px;
 }
 
-.category-grid {
+/* Role Selection Styles */
+.role-grid {
   display: grid;
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
-.category-card {
+.role-card {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.category-card:hover {
+.role-card:hover {
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
 }
 
-.category-icon {
-  font-size: 2rem;
+.role-card.role-selected {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border-color: #1d4ed8;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.role-card.role-selected .role-icon {
+  filter: brightness(1.2);
+}
+
+.role-icon {
+  font-size: 2.5rem;
   margin-bottom: 0.5rem;
   display: block;
+  transition: all 0.3s ease;
 }
 
-.category-card h4 {
+.role-card h4 {
   color: #1f2937;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   margin: 0.5rem 0;
+  transition: color 0.3s ease;
 }
 
-.category-card p {
+.role-card.role-selected h4 {
+  color: white;
+}
+
+.role-card p {
   color: #6b7280;
   font-size: 0.85rem;
   margin: 0;
   line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.role-card.role-selected p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.selected-role-info {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.role-focus {
+  color: #0c4a6e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .action-buttons {
@@ -425,10 +467,6 @@
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.2);
   color: #3b82f6;
-  /*
-  width: 36px;
-  height: 36px;
-  */
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -582,7 +620,7 @@
     padding: 1rem;
   }
   
-  .category-card {
+  .role-card {
     padding: 1rem;
   }
   
@@ -657,8 +695,8 @@
   border-color: transparent transparent #3b82f6 transparent;
 }
 
-/* Interactive Hover Effects */
-.category-card::before {
+/* Interactive Hover Effects for Role Cards */
+.role-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -671,13 +709,12 @@
   border-radius: 12px;
 }
 
-.category-card {
-  position: relative;
-  overflow: hidden;
+.role-card:hover::before {
+  opacity: 1;
 }
 
-.category-card:hover::before {
-  opacity: 1;
+.role-card.role-selected::before {
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
 }
 
 /* Performance Optimizations */
@@ -703,6 +740,10 @@
   }
   
   .quick-query-btn {
+    border-width: 2px;
+  }
+  
+  .role-card {
     border-width: 2px;
   }
 }

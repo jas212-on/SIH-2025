@@ -6,6 +6,13 @@ export default defineConfig({
   server: {
     port: 3001,
     host: true,
+    proxy: {
+      '/chat': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      }
+    },
     hmr: {
       overlay: false
     }

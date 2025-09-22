@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperclip, FaMicrophone, FaCamera, FaPaperPlane } from 'react-icons/fa';
 import './chat.css';
 
-export const ChatPage = () => {
+const ChatPage = () => {
   const [messages, setMessages] = useState([
     {
       type: 'bot',
@@ -13,6 +13,7 @@ export const ChatPage = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [selectedRole, setSelectedRole] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showQuickQueries, setShowQuickQueries] = useState(true);
   const [hasUserTyped, setHasUserTyped] = useState(false);
@@ -40,30 +41,34 @@ export const ChatPage = () => {
     "Current assessment in Rajasthan"
   ];
 
-  const categories = [
+  const userRoles = [
     {
-      title: "Current Assessment",
-      icon: "📊",
-      description: "Latest groundwater resource data",
-      queries: ["Current groundwater levels", "Recent assessments", "Latest categorization"]
+      id: 'farmer',
+      title: 'Farmer',
+      icon: '🌾',
+      description: 'Practical recommendations for agricultural water management',
+      focus: 'Get actionable insights for crop planning, irrigation guidance, and well management'
     },
     {
-      title: "Historical Data",
-      icon: "📈",
-      description: "Historical trends and analysis",
-      queries: ["Historical trends", "Yearly comparisons", "Long-term analysis"]
+      id: 'policymaker',
+      title: 'Policymaker',
+      icon: '🏛️',
+      description: 'Policy insights and governance recommendations',
+      focus: 'Access policy-relevant data, regulatory insights, and governance recommendations'
     },
     {
-      title: "State-wise Data",
-      icon: "🗺️",
-      description: "State and district level information",
-      queries: ["State-wise data", "District analysis", "Block categorization"]
+      id: 'researcher',
+      title: 'Researcher',
+      icon: '🔬',
+      description: 'Detailed data and technical analysis',
+      focus: 'Comprehensive datasets, methodologies, and detailed technical analysis'
     },
     {
-      title: "Technical Info",
-      icon: "🔬",
-      description: "Methodology and technical details",
-      queries: ["Assessment methodology", "Technical parameters", "Calculation methods"]
+      id: 'general',
+      title: 'General User',
+      icon: '👤',
+      description: 'General information and basic insights',
+      focus: 'Easy-to-understand information about groundwater resources'
     }
   ];
 
@@ -98,27 +103,53 @@ export const ChatPage = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsTyping(true);
-    
-    // Hide quick queries after sending any message
     setShowQuickQueries(false);
     setHasUserTyped(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: inputMessage,
+          role: selectedRole || "general"
+        })
+      });
+      const data = await response.json();
       const botResponse = {
         type: 'bot',
-        content: `I understand you're asking about: "${inputMessage}". This is where I would process your query and provide relevant groundwater data. The actual AI integration will be implemented separately.`,
+        content: data.final_answer || "Sorry, I couldn't find an answer.",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      setMessages(prev => [...prev, {
+        type: 'bot',
+        content: "⚠️ Error: Could not connect to server.",
+        timestamp: new Date()
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 2000);
+    }
   };
 
   const handleQuickQuery = (query) => {
     setInputMessage(query);
     setShowQuickQueries(false);
     setHasUserTyped(true);
+  };
+
+  const handleRoleSelect = (roleId) => {
+    setSelectedRole(roleId);
+    const selectedRoleData = userRoles.find(r => r.id === roleId);
+    if (selectedRoleData) {
+      const roleMessage = {
+        type: 'bot',
+        content: `Great! I've set your role as ${selectedRoleData.title}. ${selectedRoleData.focus}. How can I help you today?`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, roleMessage]);
+    }
   };
 
   const handleFileUpload = (event) => {
@@ -144,6 +175,7 @@ export const ChatPage = () => {
     }]);
     setShowQuickQueries(true);
     setHasUserTyped(false);
+    setSelectedRole('');
   };
 
   return (
@@ -188,16 +220,27 @@ export const ChatPage = () => {
         <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
           <div className="sidebar-content">
             <div className="sidebar-section">
-              <h3>Quick Categories</h3>
-              <div className="category-grid">
-                {categories.map((category, index) => (
-                  <div key={index} className="category-card">
-                    <div className="category-icon">{category.icon}</div>
-                    <h4>{category.title}</h4>
-                    <p>{category.description}</p>
+              <h3>Select Your Role</h3>
+              <div className="role-grid">
+                {userRoles.map((role) => (
+                  <div 
+                    key={role.id} 
+                    className={`role-card ${selectedRole === role.id ? 'role-selected' : ''}`}
+                    onClick={() => handleRoleSelect(role.id)}
+                  >
+                    <div className="role-icon">{role.icon}</div>
+                    <h4>{role.title}</h4>
+                    <p>{role.description}</p>
                   </div>
                 ))}
               </div>
+              {selectedRole && (
+                <div className="selected-role-info">
+                  <p className="role-focus">
+                    {userRoles.find(r => r.id === selectedRole)?.focus}
+                  </p>
+                </div>
+              )}
             </div>
             
             <div className="sidebar-section">
