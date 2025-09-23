@@ -604,10 +604,9 @@ def generate_graphrag_response(semantic_results: List[Dict], graph_results: List
     RESPONSE GUIDELINES:
     - Be clear, concise, and factual
     - Include specific numbers, units, and values from the data
-    - Combine insights from both semantic and graph results
-    - Structure responses logically with proper citations
+    - Combine insights from both semantic and graph results and give only the most appropriate result
+    - Dont include detailed explanation. ONLY answer the query of the user
     - Use professional, technical tone
-    - If data is limited, acknowledge the limitation
 
     USER QUERY: {query}
 
@@ -623,10 +622,10 @@ def generate_graphrag_response(semantic_results: List[Dict], graph_results: List
 
     Generate a comprehensive response that:
     1. Directly answers the user's question
-    2. Cites specific data sources when making claims
+    2. Dont include detailed explanation. ONLY answer the query of the user
     3. Includes relevant numerical data with units
-    4. Acknowledges any limitations in available data
-    
+    4. Answer in complete sentences using these units - The unit of rainfall is "mm", unit of area is "ha" and units for other ground water data is "ham" 
+    5. Dont mention the source from which information is taken
     Response:
     """
     
