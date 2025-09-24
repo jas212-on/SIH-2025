@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperclip, FaMicrophone, FaCamera, FaPaperPlane } from 'react-icons/fa';
+import { useState, useRef, useEffect } from 'react';
+import { FaPaperclip, FaPaperPlane, FaTrashAlt, FaRobot, FaChevronDown } from 'react-icons/fa';
+import { IoReorderThree, IoPerson } from 'react-icons/io5';
+import { GiWaterSplash } from "react-icons/gi";
 import './chat.css';
 
 const ChatPage = () => {
@@ -14,7 +16,7 @@ const ChatPage = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [selectedRole, setSelectedRole] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showQuickQueries, setShowQuickQueries] = useState(true);
   const [hasUserTyped, setHasUserTyped] = useState(false);
   const messagesEndRef = useRef(null);
@@ -157,7 +159,7 @@ const ChatPage = () => {
     if (file) {
       const fileMessage = {
         type: 'user',
-        content: `📎 Uploaded file: ${file.name}`,
+        content: <div><FaPaperclip  size={50} color='black' /> {`Uploaded file: ${file.name}`}</div>,
         timestamp: new Date(),
         isFile: true
       };
@@ -188,28 +190,28 @@ const ChatPage = () => {
               className="menu-btn interactive"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              ☰
+              <IoReorderThree  size={25} color='black' />
             </button>
             <div className="logo-section">
-              <div className="logo-icon">🌊</div>
+              <div className="logo-icon"><GiWaterSplash style={{ color: "#63daf8ff", fontSize: "50px" }} /></div>
               <div className="logo-text">
-                <h1>INGRES AI ChatBot</h1>
+                <h1>JALMITRA</h1>
                 <p className="tagline">Intelligent Groundwater Resource Assistant</p>
               </div>
             </div>
           </div>
           <div className="header-right">
-            <select 
-              className="language-selector"
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
-            >
-              {languages.map(lang => (
-                <option key={lang.code} value={lang.code}>{lang.name}</option>
-              ))}
-            </select>
-            <div className="profile-photo">
-              👤
+            <div className="language-selector-container">
+              <select 
+                className="language-selector"
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+              >
+                {languages.map(lang => (
+                  <option key={lang.code} value={lang.code}>{lang.name}</option>
+                ))}
+              </select>
+              <FaChevronDown className="language-selector-arrow" size={12} />
             </div>
           </div>
         </div>
@@ -247,7 +249,7 @@ const ChatPage = () => {
               <h3>Chat Actions</h3>
               <div className="action-buttons">
                 <button className="action-btn" onClick={clearChat}>
-                  🗑️ Clear Chat
+                  <FaTrashAlt size={20} color='black' /> Clear Chat
                 </button>
               </div>
             </div>
@@ -282,7 +284,7 @@ const ChatPage = () => {
                 className={`message ${message.type === 'user' ? 'user-message' : 'bot-message'}`}
               >
                 <div className="message-avatar">
-                  {message.type === 'user' ? '👤' : '🤖'}
+                  {message.type === 'user' ? <IoPerson size={25} color='black' /> : <FaRobot size={25} color='black' />}
                 </div>
                 <div className="message-content">
                   <div className="message-bubble">
@@ -303,7 +305,7 @@ const ChatPage = () => {
             
             {isTyping && (
               <div className="message bot-message">
-                <div className="message-avatar">🤖</div>
+                <div className="message-avatar"><FaRobot size={25} color='black' /></div>
                 <div className="message-content">
                   <div className="message-bubble typing-indicator">
                     <div className="typing-dots">
@@ -329,12 +331,6 @@ const ChatPage = () => {
                   title="Upload file"
                 >
                   <FaPaperclip size={50} color='black' />
-                </button>
-                <button className="feature-btn interactive" title="Voice input">
-                  <FaMicrophone size={50} color='black' />
-                </button>
-                <button className="feature-btn interactive" title="Camera">
-                  <FaCamera size={50} color='black'/>
                 </button>
               </div>
               <input

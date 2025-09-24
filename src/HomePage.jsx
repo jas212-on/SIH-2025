@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Database, BarChart3, Globe, MessageSquare, Users, Zap, ArrowRight, Menu, X } from 'lucide-react';
 
@@ -58,7 +58,7 @@ const HomePage = () => {
                 <Database className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">INGRES AI</h1>
+                <h1 className="text-xl font-bold text-gray-900">JALMITRA</h1>
                 <p className="text-xs text-gray-600">ChatBOT</p>
               </div>
             </div>
@@ -111,7 +111,7 @@ const HomePage = () => {
             
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-800 bg-clip-text text-transparent">
-                INGRES AI
+                JALMITRA
               </span>
               <br />
               <span className="text-gray-800">ChatBOT</span>
