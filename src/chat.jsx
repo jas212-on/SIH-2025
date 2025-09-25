@@ -899,7 +899,7 @@ const ChatPage = () => {
       }
       return updatedMessages;
     });
-  }, [selectedLanguage, i18n, t, hasUserTyped]);
+  }, [selectedLanguage, i18n, hasUserTyped]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

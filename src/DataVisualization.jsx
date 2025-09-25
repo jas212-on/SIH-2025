@@ -231,7 +231,7 @@ const DataVisualization = ({ onBack }) => {
 
   // Get available states and districts from backend options or fallback
   const getAvailableStates = () => {
-    return availableOptions?.sample_states || [
+    return  [
       'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
       'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
       'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
@@ -241,7 +241,7 @@ const DataVisualization = ({ onBack }) => {
   };
 
   const getAvailableDistricts = () => {
-    return availableOptions?.sample_districts?.Kerala || [
+    return [
       'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod', 'Kollam',
       'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad', 'Pathanamthitta',
       'Thiruvananthapuram', 'Thrissur', 'Wayanad'
