@@ -1,0 +1,37 @@
+# Never bake secrets or local env into the image — supplied via --build-arg
+.env
+.env.local
+.env.*.local
+
+# Version control / CI
+.git
+.github
+
+# Dependencies — reinstalled inside the image via npm ci
+node_modules
+
+# Build output — regenerated inside the image
+dist
+dist-ssr
+
+# Logs / caches
+*.log
+.cache
+.vite
+.eslintcache
+
+# Docs
+README.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+*.md
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# AI assistant workspace
+.claude/

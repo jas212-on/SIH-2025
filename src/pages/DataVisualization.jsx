@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, ArcElement, RadialLinearScale, Filler } from 'chart.js';
 import { Bar, Line, Pie, Doughnut, Radar } from 'react-chartjs-2';
 import { BarChart3, TrendingUp, PieChart, Download, Filter, ArrowLeft, AlertTriangle, Activity, Zap, RefreshCw } from 'lucide-react';
+import { api } from '../services/api';
+import StatusIndicator from '../components/common/StatusIndicator';
+import WaveDivider from '../components/home/WaveDivider';
 
 ChartJS.register(
   CategoryScale,
@@ -18,6 +23,9 @@ ChartJS.register(
 );
 
 const DataVisualization = ({ onBack }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const goBack = onBack || (() => navigate('/chat'));
   const [chartType, setChartType] = useState('bar');
   const [comparisonType, setComparisonType] = useState('state');
   const [selectedStates, setSelectedStates] = useState(['Kerala', 'Karnataka']);
@@ -30,11 +38,8 @@ const DataVisualization = ({ onBack }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showFilters, setShowFilters] = useState(true);
-  const [availableOptions, setAvailableOptions] = useState(null);
   const chartRef = useRef(null);
 
-  // Backend API configuration
-  const API_BASE_URL = 'http://localhost:8000';
 
   // Chart types with compatibility info
   const chartTypes = [
@@ -61,23 +66,6 @@ const DataVisualization = ({ onBack }) => {
   ];
 
   const availableYears = [2023, 2024];
-
-  // Load available options from backend
-  useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/visualization/options`);
-        if (response.ok) {
-          const options = await response.json();
-          setAvailableOptions(options);
-        }
-      } catch (error) {
-        console.error('Failed to load visualization options:', error);
-      }
-    };
-
-    fetchOptions();
-  }, []);
 
   const isCompatible = (chart, comparison) => {
     const chartInfo = chartTypes.find(c => c.id === chart);
@@ -114,19 +102,7 @@ const DataVisualization = ({ onBack }) => {
         requestData.filters.year = year;
       }
 
-      const response = await fetch(`${API_BASE_URL}/visualize`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.detail || 'Failed to generate visualization');
-      }
+      const result = await api.visualize(requestData);
 
       if (result.error) {
         setError(result.error);
@@ -249,89 +225,107 @@ const DataVisualization = ({ onBack }) => {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-8xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={onBack}
-                className="flex items-center space-x-2 px-3 py-2 text-white hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Data Visualization</h1>
-                <p className="text-sm text-gray-600">Real-time Groundwater Analytics Dashboard</p>
+    <div className="h-screen bg-ink-50 dark:bg-ink-950 flex flex-col">
+      {/* Header — matches chat.jsx / MapPage.jsx gradient bar */}
+      <header className="relative bg-gradient-to-r from-brand-700 via-brand-600 to-brand-700 shadow-card z-30 shrink-0">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={goBack}
+              title={t('backToChat')}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition shrink-0"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              title="Jalmitra home"
+              className="flex items-center gap-3 min-w-0 text-left"
+            >
+              <div className="w-10 h-10 rounded-xl bg-black ring-1 ring-white/10 flex items-center justify-center shrink-0 p-1.5">
+                <img src="/logo.png" alt="Jalmitra" className="w-full h-full object-contain" />
               </div>
-            </div>
-            <div className="flex items-center space-x-3">
+              <div className="min-w-0">
+                <h1 className="font-display text-lg sm:text-xl font-bold text-white leading-tight tracking-tight truncate">
+                  {t('pages.visualization.title')}
+                </h1>
+                <p className="text-[11px] text-white/70 truncate hidden sm:block">{t('pages.visualization.subtitle')}</p>
+              </div>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                showFilters ? 'bg-white text-brand-700' : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+            >
+              <Filter size={14} />
+              <span className="hidden sm:inline">Filters</span>
+            </button>
+            <button
+              onClick={generateVisualization}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20 text-white transition disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            {chartData && (
               <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  showFilters 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                onClick={downloadChart}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white transition"
               >
-                <Filter className="w-4 h-4" />
-                <span>Filters</span>
+                <Download size={14} />
+                <span className="hidden sm:inline">Export</span>
               </button>
-              <button
-                onClick={generateVisualization}
-                disabled={isLoading}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </button>
-              {chartData && (
-                <button
-                  onClick={downloadChart}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Export</span>
-                </button>
-              )}
+            )}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white">
+              <StatusIndicator className="text-white" />
             </div>
           </div>
         </div>
-      </div>
+        {/* Subtle flowing border accent, matching the landing page's section dividers */}
+        <WaveDivider
+          position="bottom"
+          fillClassName="fill-ink-50 dark:fill-ink-950"
+          duration={26}
+          className="!h-3 opacity-60"
+        />
+      </header>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar Filters */}
         {showFilters && (
-          <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-            <div className="p-6 space-y-6 overflow-y-auto">
+          <div className="w-80 bg-white dark:bg-ink-900 border-r border-ink-100 dark:border-ink-800 flex flex-col shrink-0">
+            <div className="p-6 space-y-6 overflow-y-auto scrollbar-thin">
               {/* Chart Type Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-3">Chart Type</label>
+                <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-3">Chart Type</label>
                 <div className="grid grid-cols-1 gap-2">
                   {chartTypes.map((type) => {
                     const IconComponent = type.icon;
                     const compatible = isCompatible(type.id, comparisonType);
                     const selected = chartType === type.id;
-                    
+
                     return (
                       <button
                         key={type.id}
                         onClick={() => handleChartTypeChange(type.id)}
                         disabled={!compatible}
-                        className={`w-full p-3 rounded-lg border text-left bg-white ${
+                        className={`w-full p-3 rounded-xl border text-left transition ${
                           selected
-                            ? 'border-blue-500 bg-blue-50 text-blue-900'
+                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-900 dark:text-brand-300'
                             : compatible
-                            ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                            : 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed'
+                            ? 'border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 hover:border-brand-300 dark:hover:border-brand-600 hover:bg-ink-50 dark:hover:bg-ink-700'
+                            : 'border-ink-100 dark:border-ink-800 bg-ink-50 dark:bg-ink-800/50 text-ink-400 dark:text-ink-600 cursor-not-allowed'
                         }`}
                       >
-                        <div className="flex items-center space-x-3">
-                          <IconComponent className="w-5 h-5" />
-                          <span className="font-medium">{type.label}</span>
+                        <div className="flex items-center gap-3">
+                          <IconComponent className="w-5 h-5 shrink-0" />
+                          <span className="font-medium text-sm">{type.label}</span>
                         </div>
                       </button>
                     );
@@ -341,11 +335,11 @@ const DataVisualization = ({ onBack }) => {
 
               {/* Comparison Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-3">Comparison Type</label>
+                <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-3">Comparison Type</label>
                 <select
                   value={comparisonType}
                   onChange={(e) => handleComparisonTypeChange(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   {comparisonTypes.map((type) => (
                     <option key={type.id} value={type.id}>
@@ -357,10 +351,10 @@ const DataVisualization = ({ onBack }) => {
 
               {/* Metrics Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-3">Metrics</label>
+                <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-3">Metrics</label>
                 <div className="space-y-2">
                   {metrics.map((metric) => (
-                    <label key={metric.id} className="flex items-center space-x-3 cursor-pointer">
+                    <label key={metric.id} className="flex items-center gap-3 cursor-pointer">
                       <input
                         type={comparisonType === 'metric' ? 'checkbox' : 'radio'}
                         name="metrics"
@@ -377,11 +371,11 @@ const DataVisualization = ({ onBack }) => {
                             setSelectedMetrics([metric.id]);
                           }
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-ink-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
                       />
                       <div className="flex-1">
-                        <span className="text-gray-900 font-medium">{metric.label}</span>
-                        <span className="text-gray-500 text-sm ml-1">({metric.unit})</span>
+                        <span className="text-ink-900 dark:text-ink-100 font-medium text-sm">{metric.label}</span>
+                        <span className="text-ink-500 dark:text-ink-400 text-xs ml-1">({metric.unit})</span>
                       </div>
                     </label>
                   ))}
@@ -391,10 +385,10 @@ const DataVisualization = ({ onBack }) => {
               {/* Dynamic filters based on comparison type */}
               {comparisonType === 'state' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-3">States</label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                  <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-3">States</label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin border border-ink-200 dark:border-ink-700 rounded-xl p-3">
                     {getAvailableStates().map((state) => (
-                      <label key={state} className="flex items-center space-x-2 cursor-pointer">
+                      <label key={state} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={selectedStates.includes(state)}
@@ -405,9 +399,9 @@ const DataVisualization = ({ onBack }) => {
                               setSelectedStates(selectedStates.filter(s => s !== state));
                             }
                           }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-ink-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
                         />
-                        <span className="text-gray-700">{state}</span>
+                        <span className="text-ink-700 dark:text-ink-300 text-sm">{state}</span>
                       </label>
                     ))}
                   </div>
@@ -416,10 +410,10 @@ const DataVisualization = ({ onBack }) => {
 
               {comparisonType === 'district' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-3">Districts (Kerala)</label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                  <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-3">Districts (Kerala)</label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin border border-ink-200 dark:border-ink-700 rounded-xl p-3">
                     {getAvailableDistricts().map((district) => (
-                      <label key={district} className="flex items-center space-x-2 cursor-pointer">
+                      <label key={district} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={selectedDistricts.includes(district)}
@@ -430,9 +424,9 @@ const DataVisualization = ({ onBack }) => {
                               setSelectedDistricts(selectedDistricts.filter(d => d !== district));
                             }
                           }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-ink-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
                         />
-                        <span className="text-gray-700">{district}</span>
+                        <span className="text-ink-700 dark:text-ink-300 text-sm">{district}</span>
                       </label>
                     ))}
                   </div>
@@ -442,10 +436,10 @@ const DataVisualization = ({ onBack }) => {
               {comparisonType === 'yearly' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-3">Years</label>
+                    <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-3">Years</label>
                     <div className="space-y-2">
                       {availableYears.map((yr) => (
-                        <label key={yr} className="flex items-center space-x-2 cursor-pointer">
+                        <label key={yr} className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={selectedYears.includes(yr)}
@@ -456,19 +450,19 @@ const DataVisualization = ({ onBack }) => {
                                 setSelectedYears(selectedYears.filter(y => y !== yr));
                               }
                             }}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded border-ink-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
                           />
-                          <span className="text-gray-700">{yr}</span>
+                          <span className="text-ink-700 dark:text-ink-300 text-sm">{yr}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Entity</label>
+                    <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-2">Entity</label>
                     <select
                       value={selectedEntity}
                       onChange={(e) => setSelectedEntity(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full p-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                     >
                       {getAvailableStates().map((state) => (
                         <option key={state} value={state}>{state}</option>
@@ -480,11 +474,11 @@ const DataVisualization = ({ onBack }) => {
 
               {comparisonType === 'metric' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Entity</label>
+                  <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-2">Entity</label>
                   <select
                     value={selectedEntity}
                     onChange={(e) => setSelectedEntity(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     {getAvailableStates().map((state) => (
                       <option key={state} value={state}>{state}</option>
@@ -496,11 +490,11 @@ const DataVisualization = ({ onBack }) => {
               {/* Year filter for non-yearly comparisons */}
               {comparisonType !== 'yearly' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Year</label>
+                  <label className="block text-sm font-medium text-ink-900 dark:text-ink-100 mb-2">Year</label>
                   <select
                     value={year}
                     onChange={(e) => setYear(parseInt(e.target.value))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     {availableYears.map((yr) => (
                       <option key={yr} value={yr}>{yr}</option>
@@ -508,51 +502,38 @@ const DataVisualization = ({ onBack }) => {
                   </select>
                 </div>
               )}
-
-              {/* Backend Connection Status */}
-              <div className="mt-6 p-3 bg-gray-50 rounded-lg">
-                <div className="text-xs text-gray-600">
-                  <div className="flex items-center justify-between mb-1">
-                    <span>Backend Status:</span>
-                    <div className={`w-2 h-2 rounded-full ${availableOptions ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {availableOptions ? 'Connected' : 'Offline - Using fallback data'}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
 
         {/* Main Chart Area */}
-        <div className="flex-1 flex flex-col overflow-auto">
+        <div className="flex-1 flex flex-col overflow-auto scrollbar-thin">
           <div className="flex-1 p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-full flex flex-col">
+            <div className="bg-white dark:bg-ink-900 rounded-2xl shadow-soft border border-ink-100 dark:border-ink-800 h-full flex flex-col">
               {isLoading && (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600 font-medium">Fetching data from server...</p>
-                    <p className="text-gray-500 text-sm mt-1">Generating visualization...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent mx-auto mb-4"></div>
+                    <p className="text-ink-600 dark:text-ink-300 font-medium">Fetching data from server...</p>
+                    <p className="text-ink-400 dark:text-ink-500 text-sm mt-1">Generating visualization...</p>
                   </div>
                 </div>
               )}
 
               {error && (
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center max-w-md">
-                    <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Visualization Error</h3>
-                    <p className="text-gray-600 mb-4 text-sm">{error}</p>
+                  <div className="text-center max-w-md px-4">
+                    <AlertTriangle className="w-16 h-16 text-rose-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-ink-900 dark:text-white mb-2">Visualization Error</h3>
+                    <p className="text-ink-600 dark:text-ink-300 mb-4 text-sm">{error}</p>
                     <div className="space-y-2">
                       <button
                         onClick={generateVisualization}
-                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-semibold transition-colors"
                       >
                         Retry
                       </button>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-ink-400 dark:text-ink-500">
                         Make sure the backend server is running on port 8000
                       </p>
                     </div>
@@ -571,9 +552,9 @@ const DataVisualization = ({ onBack }) => {
               {!chartData && !isLoading && !error && (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <BarChart3 className="w-20 h-20 text-gray-400 mx-auto mb-6" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to Visualize</h3>
-                    <p className="text-gray-600">Configure your parameters and click refresh to fetch real data</p>
+                    <BarChart3 className="w-20 h-20 text-ink-300 dark:text-ink-700 mx-auto mb-6" />
+                    <h3 className="text-xl font-semibold text-ink-900 dark:text-white mb-2">Ready to Visualize</h3>
+                    <p className="text-ink-500 dark:text-ink-400">Configure your parameters and click refresh to fetch real data</p>
                   </div>
                 </div>
               )}
@@ -583,42 +564,42 @@ const DataVisualization = ({ onBack }) => {
           {/* Chart Info Panel */}
           {chartData && (
             <div className="px-6 pb-6">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="bg-white dark:bg-ink-900 rounded-2xl shadow-soft border border-ink-100 dark:border-ink-800 p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Analysis Summary</h3>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <h3 className="text-lg font-semibold text-ink-900 dark:text-white">Analysis Summary</h3>
+                  <div className="flex items-center gap-2 text-sm text-ink-500 dark:text-ink-400">
                     <Zap className="w-4 h-4" />
                     <span>Processed in {chartData.processing_time}s</span>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-xs font-medium text-blue-700 uppercase mb-1">Chart Type</div>
-                    <div className="text-blue-900 font-semibold capitalize">{chartType}</div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="text-center p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl">
+                    <div className="text-xs font-medium text-brand-700 dark:text-brand-400 uppercase mb-1">Chart Type</div>
+                    <div className="text-brand-900 dark:text-brand-200 font-semibold capitalize">{chartType}</div>
                   </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-xs font-medium text-green-700 uppercase mb-1">Comparison</div>
-                    <div className="text-green-900 font-semibold capitalize">{comparisonType}</div>
+                  <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
+                    <div className="text-xs font-medium text-emerald-700 dark:text-emerald-400 uppercase mb-1">Comparison</div>
+                    <div className="text-emerald-900 dark:text-emerald-200 font-semibold capitalize">{comparisonType}</div>
                   </div>
-                  <div className="text-center p-3 bg-purple-50 rounded-lg">
-                    <div className="text-xs font-medium text-purple-700 uppercase mb-1">Metrics</div>
-                    <div className="text-purple-900 font-semibold">{selectedMetrics.length}</div>
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+                    <div className="text-xs font-medium text-purple-700 dark:text-purple-400 uppercase mb-1">Metrics</div>
+                    <div className="text-purple-900 dark:text-purple-200 font-semibold">{selectedMetrics.length}</div>
                   </div>
-                  <div className="text-center p-3 bg-orange-50 rounded-lg">
-                    <div className="text-xs font-medium text-orange-700 uppercase mb-1">Data Points</div>
-                    <div className="text-orange-900 font-semibold">{chartData.metadata?.data_points || 0}</div>
+                  <div className="text-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+                    <div className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase mb-1">Data Points</div>
+                    <div className="text-amber-900 dark:text-amber-200 font-semibold">{chartData.metadata?.data_points || 0}</div>
                   </div>
                 </div>
 
                 {/* Query Info */}
                 {chartData.metadata?.query_used && (
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                  <div className="mt-4 p-3 bg-ink-50 dark:bg-ink-800/60 rounded-xl">
                     <details className="cursor-pointer">
-                      <summary className="text-sm font-medium text-gray-700 hover:text-gray-900">
+                      <summary className="text-sm font-medium text-ink-700 dark:text-ink-300 hover:text-ink-900 dark:hover:text-white">
                         Database Query Used
                       </summary>
-                      <pre className="mt-2 text-xs text-gray-600 bg-white p-2 rounded border overflow-x-auto">
+                      <pre className="mt-2 text-xs text-ink-600 dark:text-ink-300 bg-white dark:bg-ink-900 p-2 rounded-lg border border-ink-100 dark:border-ink-700 overflow-x-auto">
                         {chartData.metadata.query_used}
                       </pre>
                     </details>
