@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Chart, registerables } from "chart.js";
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, LineChart, ArrowLeft, Sparkles, Droplets, ClipboardList, ShieldAlert, Info } from "lucide-react";
 import { api } from "../services/api";
-import { ALL_STATES } from "../config/constants";
+import { useStates } from "../hooks/useReferenceData";
 import { useToast } from "../components/common/Toast";
 import WaveDivider from "../components/home/WaveDivider";
 
@@ -28,6 +28,7 @@ export default function ForecastPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [state, setState] = useState("KERALA");
+  const { states } = useStates();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -182,7 +183,7 @@ export default function ForecastPage() {
             onChange={(e) => setState(e.target.value)}
             className="px-3 py-2 rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
-            {ALL_STATES.map((s) => (
+            {states.map((s) => (
               <option key={s} value={s}>
                 {s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}
               </option>

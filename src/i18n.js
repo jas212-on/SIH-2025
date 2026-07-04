@@ -47,7 +47,7 @@ const shared = {
     footerLine1: "© 2026 Jalmitra",
     footerLine2: "A VioniX product",
     whatIsTitle: "What is Jalmitra?",
-    whatIsBody: "Jalmitra is a groundwater intelligence platform built on India's Central Ground Water Board (CGWB) assessment data. It turns dense annual resource assessments into natural-language answers, forecasts, farmer advisories, and early-warning alerts — so that farmers, policymakers, researchers, and the general public can understand groundwater conditions without needing to read a technical report.",
+    whatIsBody: "Jalmitra is a groundwater intelligence platform built on India's Central Ground Water Board (CGWB) assessment data. It turns dense annual resource assessments into natural-language answers, forecasts, and farmer advisories — so that farmers, policymakers, researchers, and the general public can understand groundwater conditions without needing to read a technical report.",
     whatItDoesTitle: "What it does",
     features: [
       "Conversational Q&A over official groundwater datasets, in six Indian languages",

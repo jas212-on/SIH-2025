@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Wheat, ArrowLeft, Droplets, CalendarDays, Repeat, Sprout, Sparkles, ClipboardList, Info } from "lucide-react";
 import { api } from "../services/api";
-import { ALL_STATES, KERALA_DISTRICTS } from "../config/constants";
+import { useStates, useDistricts } from "../hooks/useReferenceData";
 import { useToast } from "../components/common/Toast";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import WaveDivider from "../components/home/WaveDivider";
@@ -21,6 +21,8 @@ export default function AdvisoryPage() {
   const navigate = useNavigate();
   const [state, setState] = useState("KERALA");
   const [district, setDistrict] = useState("");
+  const { states } = useStates();
+  const { districts } = useDistricts(state);
   const [crop, setCrop] = useState("rice");
   const [crops, setCrops] = useState([]);
   const [result, setResult] = useState(null);
@@ -84,7 +86,7 @@ export default function AdvisoryPage() {
             <label className="text-[11px] font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide block mb-1">State</label>
             <select value={state} onChange={(e) => { setState(e.target.value); setDistrict(""); }}
               className="px-3 py-2 rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-              {ALL_STATES.map((s) => <option key={s} value={s}>{s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
+              {states.map((s) => <option key={s} value={s}>{s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
             </select>
           </div>
           <div>
@@ -92,7 +94,7 @@ export default function AdvisoryPage() {
             <select value={district} onChange={(e) => setDistrict(e.target.value)}
               className="px-3 py-2 rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
               <option value="">Whole state</option>
-              {state === "KERALA" && KERALA_DISTRICTS.map((d) => <option key={d} value={d}>{d.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
+              {districts.map((d) => <option key={d} value={d}>{d.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
             </select>
           </div>
           <div>

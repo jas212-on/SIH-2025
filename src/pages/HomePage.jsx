@@ -137,7 +137,7 @@ const HomePage = () => {
 
               <Reveal delay={0.2}>
                 <p className="text-xl text-ink-600 dark:text-ink-300 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                  Jalmitra turns India's CGWB groundwater assessments into forecasts, alerts, and
+                  Jalmitra turns India's CGWB groundwater assessments into forecasts and
                   role-specific recommendations — through natural conversation.
                 </p>
               </Reveal>
@@ -278,7 +278,7 @@ const HomePage = () => {
                   coordination of the Central Level Expert Group (CLEG).
                 </p>
                 <p className="text-lg leading-relaxed">
-                  Jalmitra turns that assessment data into forecasts, alerts, and role-aware recommendations —
+                  Jalmitra turns that assessment data into forecasts and role-aware recommendations —
                   accessible through natural conversation in six Indian languages.
                 </p>
                 <div className="flex items-start gap-4">
@@ -310,7 +310,7 @@ const HomePage = () => {
               <RevealItem className="bg-white dark:bg-ink-900 p-6 rounded-2xl shadow-soft">
                 <MessageSquare className="w-9 h-9 text-brand-600 mb-4" />
                 <h4 className="font-semibold text-ink-900 dark:text-white mb-1">AI-Powered</h4>
-                <p className="text-ink-500 dark:text-ink-400 text-sm">Graph + semantic retrieval, cited</p>
+                <p className="text-ink-500 dark:text-ink-400 text-sm">Graph-grounded answers, always cited</p>
               </RevealItem>
             </RevealGroup>
           </div>

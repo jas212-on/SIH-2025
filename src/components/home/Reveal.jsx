@@ -13,10 +13,11 @@ const itemVariants = {
 };
 
 // Single element fade/slide-up on scroll into view.
-export function Reveal({ children, className, delay = 0 }) {
+export function Reveal({ children, className, delay = 0, id }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
+      id={id}
       className={className}
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -45,10 +46,10 @@ export function RevealGroup({ children, className }) {
   );
 }
 
-export function RevealItem({ children, className }) {
+export function RevealItem({ children, className, id }) {
   const reduce = useReducedMotion();
   return (
-    <motion.div className={className} variants={reduce ? undefined : itemVariants}>
+    <motion.div id={id} className={className} variants={reduce ? undefined : itemVariants}>
       {children}
     </motion.div>
   );

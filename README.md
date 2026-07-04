@@ -17,10 +17,10 @@ CGWB's *Assessment of Dynamic Ground Water Resources of India* is real, detailed
 Every page in this app sits somewhere on the same axis the whole platform is built around:
 
 ```
-Chatbot (describe)  →  Dashboard (monitor)  →  Predictor (forecast)  →  Advisor (recommend)  →  Actor (intervene/alert)
+Chatbot (describe)  →  Dashboard (monitor)  →  Predictor (forecast)  →  Advisor (recommend)  →  Actor (intervene)
 ```
 
-Chat and the Map describe the current situation. Compare lets you monitor trends across states/districts. Forecast predicts where a district is headed. Advisory and the Simulator turn that prediction into a recommendation or a testable intervention. Alerts (subscribed to from Chat) close the loop by pushing to the user instead of waiting to be asked.
+Chat and the Map describe the current situation. Compare lets you monitor trends across states/districts. Forecast predicts where a district is headed. Advisory and the Simulator turn that prediction into a recommendation or a testable intervention.
 
 ### Who uses it
 

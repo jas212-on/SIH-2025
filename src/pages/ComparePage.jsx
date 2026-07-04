@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Chart, registerables } from "chart.js";
 import { BarChart3, ArrowRight, ArrowLeft, Download, FileDown, Clock, Play } from "lucide-react";
 import { api } from "../services/api";
-import { METRICS, ALL_STATES, AVAILABLE_YEARS, CHART_TYPES } from "../config/constants";
+import { AVAILABLE_YEARS, CHART_TYPES } from "../config/constants";
+import { useStates, useMetrics } from "../hooks/useReferenceData";
 import { useToast } from "../components/common/Toast";
 import WaveDivider from "../components/home/WaveDivider";
 
@@ -44,6 +45,8 @@ export default function ComparePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [mode, setMode]   = useState("states");
+  const { states: ALL_STATES } = useStates();
+  const { metrics: METRICS } = useMetrics();
   const [params, setParams] = useState({
     states:  ["KERALA", "MAHARASHTRA"],
     metric:  "availability",

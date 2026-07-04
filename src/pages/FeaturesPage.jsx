@@ -1,24 +1,29 @@
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, MessageSquare, Map, BarChart3, TrendingUp, Wheat, SlidersHorizontal,
-  MapPin, FileText, Bell, Satellite, Globe2, Mic, ShieldCheck, Sparkles, ArrowRight,
+  MapPin, FileText, Globe2, ShieldCheck, Sparkles, ArrowRight, ExternalLink,
 } from 'lucide-react';
 import WaveDivider from '../components/home/WaveDivider';
 import { Reveal, RevealGroup, RevealItem } from '../components/home/Reveal';
 
+// Ordered along Jalmitra's own design axis: Describe -> Monitor -> Forecast -> Recommend.
+// (The platform doesn't yet ship an "Alert/Actor" stage feature, so that stage is omitted
+// here rather than claimed.)
 const CORE_FEATURES = [
   {
     icon: MessageSquare,
     title: 'GraphRAG-Powered Chat',
     route: '/chat',
     status: 'Live',
+    stage: 'Describe',
     description:
-      "Ask groundwater questions in plain language and get cited, role-aware answers. Jalmitra's dual-pipeline RAG combines a Neo4j knowledge graph (structured relationships between states, districts, years, and metrics) with Pinecone semantic search (vector similarity over assessment text), then has Gemini synthesize both into a single grounded answer — with follow-up conversational context and streaming responses.",
+      "Ask groundwater questions in plain language and get cited, role-aware answers. Every query runs a Cypher query against a Neo4j knowledge graph (structured relationships between states, districts, years, and metrics), which Gemini synthesizes into a grounded answer — with follow-up conversational context and streaming responses. A Pinecone semantic-search layer exists as an additional retrieval source but is disabled on the hosted demo (see Documentation for why).",
     points: [
       'Role-aware tone: farmer, policymaker, researcher, or general public',
       'Streaming Server-Sent Events for real-time token output',
       'Multilingual: English, हिंदी, తెలుగు, தமிழ், ಕನ್ನಡ, മലയാളം',
       'Conversational memory over the last 5 turns',
+      'Voice input (browser speech-to-text) and spoken responses (English only, on supporting browsers)',
     ],
   },
   {
@@ -26,6 +31,7 @@ const CORE_FEATURES = [
     title: 'Interactive Groundwater Map',
     route: '/map',
     status: 'Live',
+    stage: 'Monitor',
     description:
       'A live, color-coded choropleth of every Indian state and union territory. Pick a metric — rainfall, recharge, draft, availability, or groundwater resources — and a year, and the map recolors instantly. Click any state to jump straight into a chat pre-filled with that region.',
     points: [
@@ -39,6 +45,7 @@ const CORE_FEATURES = [
     title: 'Comparative Data Visualization',
     route: '/compare',
     status: 'Live',
+    stage: 'Monitor',
     description:
       'Build bar, line, pie, doughnut, and radar charts comparing states, districts, years, or multiple metrics side by side. Every chart is backed by live Cypher queries against the knowledge graph, not static exports — and every chart can be downloaded as PNG or the underlying data exported as CSV.',
     points: [
@@ -48,10 +55,25 @@ const CORE_FEATURES = [
     ],
   },
   {
+    icon: MapPin,
+    title: 'Crowdsourced Field Observations',
+    route: '/field-data',
+    status: 'Live',
+    stage: 'Monitor',
+    description:
+      'Official CGWB district-level detail currently only exists for Kerala — crowdsourcing is the fastest way to widen coverage without a new government data partnership. Anyone can submit a real well-depth reading for their state/district; submissions are stored as a distinct FieldObservation node in the graph, clearly separated from official data.',
+    points: [
+      'No account required — lightweight per-IP rate limiting instead of full auth',
+      'Clearly labeled "community-reported, unverified" to preserve data trust',
+      'Closes the biggest gap in current data coverage',
+    ],
+  },
+  {
     icon: TrendingUp,
     title: 'Predictive Forecasting',
     route: '/forecast',
     status: 'Live',
+    stage: 'Forecast',
     description:
       "With only two years of assessment data (2023–2024), a heavyweight model like Prophet or an LSTM would be overfitting theatre — so Jalmitra uses transparent linear-trend extrapolation and is explicit about confidence given the short history. Forecasts project stage-of-extraction 1–3 years ahead per state or district, flagging exactly when a region is projected to cross into a worse risk band.",
     points: [
@@ -61,23 +83,11 @@ const CORE_FEATURES = [
     ],
   },
   {
-    icon: Wheat,
-    title: 'Farmer Advisory',
-    route: '/advisory',
-    status: 'Live',
-    description:
-      "A structured, form-driven recommendation engine — not another chat message. Combines groundwater stage-of-extraction and rainfall (pulled live from the graph) with public ICAR/CWC crop water-requirement reference tables to produce a sowing/irrigation recommendation card: crop, water-availability confidence, suggested action, and risk flag.",
-    points: [
-      'Rule-based, transparent recommendations (not a black-box model)',
-      'Crop-specific sowing windows and irrigation dependency ratios',
-      'Water-efficient alternative crop suggestions where relevant',
-    ],
-  },
-  {
     icon: SlidersHorizontal,
     title: 'What-If Simulator',
     route: '/simulator',
     status: 'Live',
+    stage: 'Forecast',
     description:
       'Adjust a slider — "reduce agricultural draft by 15%" — and watch the projected stage-of-extraction trajectory update over a multi-year horizon. Built on the same forecasting model as the Forecast page, this turns Jalmitra from a passive lookup tool into a policy-testing sandbox for questions like "what would it take to keep this district Safe?"',
     points: [
@@ -87,16 +97,17 @@ const CORE_FEATURES = [
     ],
   },
   {
-    icon: MapPin,
-    title: 'Crowdsourced Field Observations',
-    route: '/field-data',
+    icon: Wheat,
+    title: 'Farmer Advisory',
+    route: '/advisory',
     status: 'Live',
+    stage: 'Recommend',
     description:
-      'Official CGWB district-level detail currently only exists for Kerala — crowdsourcing is the fastest way to widen coverage without a new government data partnership. Anyone can submit a real-time well-depth reading for their state/district; submissions are stored as a distinct FieldObservation node in the graph, clearly separated from and labeled apart from official data.',
+      "A structured, form-driven recommendation engine — not another chat message. Combines groundwater stage-of-extraction and rainfall (pulled live from the graph) with public ICAR/CWC crop water-requirement reference tables to produce a sowing/irrigation recommendation card: crop, water-availability confidence, suggested action, and risk flag.",
     points: [
-      'No account required — lightweight per-IP rate limiting instead of full auth',
-      'Clearly labeled "community-reported, unverified" to preserve data trust',
-      'Closes the biggest gap in current data coverage',
+      'Rule-based, transparent recommendations (not a black-box model)',
+      'Crop-specific sowing windows and irrigation dependency ratios',
+      'Water-efficient alternative crop suggestions where relevant',
     ],
   },
   {
@@ -104,6 +115,7 @@ const CORE_FEATURES = [
     title: 'PDF Report Generation',
     route: '/reports',
     status: 'Live',
+    stage: 'Recommend',
     description:
       'Generate a shareable groundwater report for any state or district across a year range — charts, a Gemini-written narrative, and a full data table assembled into a downloadable PDF. Built for policymakers and researchers who need something to hand upward, not just a chat transcript.',
     points: [
@@ -112,35 +124,17 @@ const CORE_FEATURES = [
       'One click, no manual formatting required',
     ],
   },
-  {
-    icon: Bell,
-    title: 'Early-Warning Alerts',
-    route: '/chat',
-    status: 'Live',
-    description:
-      'Subscribe to a district or state and get notified when new data pushes it across a risk threshold (e.g. stage-of-extraction crossing 100% into "over-exploited"). A scheduled backend job checks incoming data against thresholds and delivers alerts by email — this is the feature that turns Jalmitra from "ask when curious" into "tells you when it matters."',
-    points: [
-      'Threshold-based subscriptions per state/district',
-      'SMTP email delivery, with console logging as a safe dev-mode fallback',
-      'The core habit-forming loop a static dashboard lacks',
-    ],
-  },
-  {
-    icon: Satellite,
-    title: 'Satellite Overlay',
-    route: '/map',
-    status: 'In progress',
-    description:
-      'A supplementary remote-sensing signal — vegetation index and soil-moisture readings — cross-referenced against groundwater graph data on the map view. The API contract is stable today with deterministic seeded data; swapping in a real Bhuvan (ISRO) or Google Earth Engine feed requires no frontend changes.',
-    points: [
-      'Stable endpoint contract ready for a live data source swap',
-      'Cross-referenced against existing groundwater metrics',
-    ],
-  },
 ];
 
+const STAGE_COLORS = {
+  Describe: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+  Monitor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  Forecast: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  Recommend: 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400',
+};
+
 const ROLE_LENS = [
-  { icon: Wheat, role: 'Farmers', focus: 'Sowing/irrigation advisory, simple language, voice-friendly design goals, crop-specific water guidance.' },
+  { icon: Wheat, role: 'Farmers', focus: 'Sowing/irrigation advisory, simple language, voice input/output in chat, crop-specific water guidance.' },
   { icon: ShieldCheck, role: 'Policymakers', focus: 'What-if simulation, forecasting, PDF reports, cross-district comparison for intervention planning.' },
   { icon: Sparkles, role: 'Researchers', focus: 'Cited answers, raw CSV/JSON export, transparent methodology (linear extrapolation, not a black box).' },
   { icon: Globe2, role: 'General Public', focus: 'Plain-language answers to "is my area\'s groundwater safe?" in six Indian languages.' },
@@ -214,15 +208,20 @@ export default function FeaturesPage() {
                       <div className="w-12 h-12 rounded-xl bg-brand-600/10 flex items-center justify-center text-brand-600 group-hover:scale-110 transition-transform duration-300 shrink-0">
                         <Icon className="w-6 h-6" />
                       </div>
-                      <span
-                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${
-                          f.status === 'Live'
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                        }`}
-                      >
-                        {f.status}
-                      </span>
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        <span
+                          className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                            f.status === 'Live'
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                              : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                          }`}
+                        >
+                          {f.status}
+                        </span>
+                        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STAGE_COLORS[f.stage]}`}>
+                          {f.stage}
+                        </span>
+                      </div>
                     </div>
                     <h3 className="text-xl font-semibold text-ink-900 dark:text-white mb-2">{f.title}</h3>
                     <p className="text-sm text-ink-600 dark:text-ink-400 leading-relaxed mb-4">{f.description}</p>
@@ -269,20 +268,32 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* Roadmap note */}
+      {/* Technical details CTA */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
-            <Mic className="w-8 h-8 text-brand-600 mx-auto mb-4" />
-            <h3 className="font-display text-2xl font-bold text-ink-900 dark:text-white mb-3">Still on the roadmap</h3>
-            <p className="text-ink-600 dark:text-ink-300 leading-relaxed">
-              A full voice interface (speech-to-text input, text-to-speech output) and a real Bhuvan/Google Earth
-              Engine satellite integration are planned next — the language-detection and translation layer that
-              would power voice input is already part of the chat pipeline today.
+            <h3 className="font-display text-2xl font-bold text-ink-900 dark:text-white mb-3">Want the technical details?</h3>
+            <p className="text-ink-600 dark:text-ink-300 leading-relaxed mb-6">
+              See how the GraphRAG pipeline is built, what's deployed in production vs. self-hosted, and the full REST API reference.
             </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <button
+                onClick={() => navigate('/documentation')}
+                className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-700 transition"
+              >
+                Read the Documentation <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => navigate('/api-guide')}
+                className="inline-flex items-center gap-1.5 border border-ink-200 dark:border-ink-700 text-ink-700 dark:text-ink-200 px-5 py-2.5 rounded-full text-sm font-semibold hover:border-brand-400 hover:text-brand-600 transition"
+              >
+                Explore the API Guide <ExternalLink className="w-4 h-4" />
+              </button>
+            </div>
           </Reveal>
         </div>
       </section>
+
     </div>
   );
 }

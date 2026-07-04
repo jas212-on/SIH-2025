@@ -5,8 +5,12 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import { Bar, Line, Pie, Doughnut, Radar } from 'react-chartjs-2';
 import { BarChart3, TrendingUp, PieChart, Download, Filter, ArrowLeft, AlertTriangle, Activity, Zap, RefreshCw } from 'lucide-react';
 import { api } from '../services/api';
+import { useStates, useDistricts } from '../hooks/useReferenceData';
 import StatusIndicator from '../components/common/StatusIndicator';
 import WaveDivider from '../components/home/WaveDivider';
+
+// Backend returns state/district names in UPPERCASE; display them title-cased.
+const titleCase = (s) => (s || '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 
 ChartJS.register(
   CategoryScale,
@@ -28,11 +32,13 @@ const DataVisualization = ({ onBack }) => {
   const goBack = onBack || (() => navigate('/chat'));
   const [chartType, setChartType] = useState('bar');
   const [comparisonType, setComparisonType] = useState('state');
-  const [selectedStates, setSelectedStates] = useState(['Kerala', 'Karnataka']);
-  const [selectedDistricts, setSelectedDistricts] = useState(['Kottayam', 'Ernakulam']);
+  const [selectedStates, setSelectedStates] = useState(['KERALA', 'KARNATAKA']);
+  const [selectedDistricts, setSelectedDistricts] = useState(['KOTTAYAM', 'ERNAKULAM']);
   const [selectedYears, setSelectedYears] = useState([2023, 2024]);
   const [selectedMetrics, setSelectedMetrics] = useState(['rainfall']);
-  const [selectedEntity, setSelectedEntity] = useState('Kerala');
+  const [selectedEntity, setSelectedEntity] = useState('KERALA');
+  const { states: availableStates } = useStates();
+  const { districts: availableDistricts } = useDistricts('KERALA');
   const [year, setYear] = useState(2024);
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -205,24 +211,11 @@ const DataVisualization = ({ onBack }) => {
     }
   };
 
-  // Get available states and districts from backend options or fallback
-  const getAvailableStates = () => {
-    return  [
-      'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
-      'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
-      'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-      'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
-      'Uttarakhand', 'West Bengal', 'Delhi'
-    ];
-  };
-
-  const getAvailableDistricts = () => {
-    return [
-      'Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod', 'Kollam',
-      'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad', 'Pathanamthitta',
-      'Thiruvananthapuram', 'Thrissur', 'Wayanad'
-    ];
-  };
+  // States and districts come from the backend (with a bundled fallback) via
+  // the shared reference-data hooks above, so the pickers stay in sync with the
+  // data actually loaded on the server.
+  const getAvailableStates = () => availableStates;
+  const getAvailableDistricts = () => availableDistricts;
 
   return (
     <div className="h-screen bg-ink-50 dark:bg-ink-950 flex flex-col">
@@ -401,7 +394,7 @@ const DataVisualization = ({ onBack }) => {
                           }}
                           className="rounded border-ink-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
                         />
-                        <span className="text-ink-700 dark:text-ink-300 text-sm">{state}</span>
+                        <span className="text-ink-700 dark:text-ink-300 text-sm">{titleCase(state)}</span>
                       </label>
                     ))}
                   </div>
@@ -426,7 +419,7 @@ const DataVisualization = ({ onBack }) => {
                           }}
                           className="rounded border-ink-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
                         />
-                        <span className="text-ink-700 dark:text-ink-300 text-sm">{district}</span>
+                        <span className="text-ink-700 dark:text-ink-300 text-sm">{titleCase(district)}</span>
                       </label>
                     ))}
                   </div>
@@ -465,7 +458,7 @@ const DataVisualization = ({ onBack }) => {
                       className="w-full p-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                     >
                       {getAvailableStates().map((state) => (
-                        <option key={state} value={state}>{state}</option>
+                        <option key={state} value={state}>{titleCase(state)}</option>
                       ))}
                     </select>
                   </div>
@@ -481,7 +474,7 @@ const DataVisualization = ({ onBack }) => {
                     className="w-full p-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     {getAvailableStates().map((state) => (
-                      <option key={state} value={state}>{state}</option>
+                      <option key={state} value={state}>{titleCase(state)}</option>
                     ))}
                   </select>
                 </div>

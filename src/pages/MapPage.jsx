@@ -10,7 +10,8 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import { api } from "../services/api";
-import { METRICS, AVAILABLE_YEARS } from "../config/constants";
+import { AVAILABLE_YEARS } from "../config/constants";
+import { useMetrics } from "../hooks/useReferenceData";
 import { useToast } from "../components/common/Toast";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import FlowBackground from "../components/home/FlowBackground";
@@ -59,6 +60,7 @@ function titleCase(s) {
 
 export default function MapPage() {
   const { t } = useTranslation();
+  const { metrics: METRICS } = useMetrics();
   const [metric, setMetric] = useState("availability");
   const [year, setYear]     = useState(AVAILABLE_YEARS[AVAILABLE_YEARS.length - 1]);
   const [dataByYear, setDataByYear] = useState({}); // { [year]: { STATE: {value, lat, lng} } }

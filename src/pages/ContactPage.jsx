@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Mail, Github, Info, MessageSquare, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Info, MessageSquare, HelpCircle, Code2 } from 'lucide-react';
 import WaveDivider from '../components/home/WaveDivider';
 import { Reveal, RevealGroup, RevealItem } from '../components/home/Reveal';
 
@@ -15,11 +15,11 @@ const FAQS = [
   },
   {
     q: 'Can I use Jalmitra\'s data or API for my own project?',
-    a: 'The underlying CGWB data is public. Reach out at the email below if you want to discuss API access, data exports, or collaboration.',
+    a: 'The underlying CGWB data is public, and every feature is backed by a plain REST API — see the API Guide for the full reference. Reach out at the email below if you want to discuss access, exports, or collaboration.',
   },
   {
     q: 'I found a bug or have a feature request — where do I report it?',
-    a: 'Open an issue on the relevant GitHub repository (frontend or backend), or email us directly using the contact card below.',
+    a: 'Email us directly using the contact card below with a description of the issue and, if possible, the steps to reproduce it.',
   },
 ];
 
@@ -64,7 +64,7 @@ export default function ContactPage() {
           </Reveal>
         </div>
 
-        <RevealGroup className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 mb-20">
+        <RevealGroup className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           <RevealItem>
             <a
               href="mailto:vionix37@gmail.com"
@@ -103,6 +103,19 @@ export default function ContactPage() {
               <p className="text-sm text-ink-500 dark:text-ink-400">Fastest way to get a data-backed answer</p>
             </button>
           </RevealItem>
+
+          <RevealItem>
+            <button
+              onClick={() => navigate('/api-guide')}
+              className="group w-full flex flex-col items-center text-center bg-white dark:bg-ink-900 border border-ink-100 dark:border-ink-800 rounded-2xl p-8 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all duration-300 h-full"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-brand-600/10 flex items-center justify-center text-brand-600 mb-4 group-hover:scale-110 transition-transform">
+                <Code2 className="w-7 h-7" />
+              </div>
+              <h3 className="font-semibold text-ink-900 dark:text-white mb-1">API Guide</h3>
+              <p className="text-sm text-ink-500 dark:text-ink-400">Build against Jalmitra's REST endpoints directly</p>
+            </button>
+          </RevealItem>
         </RevealGroup>
 
         {/* FAQ */}
@@ -131,11 +144,8 @@ export default function ContactPage() {
       </section>
 
       <footer className="bg-ink-950 text-white py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center text-ink-400 text-sm flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+        <div className="max-w-4xl mx-auto px-4 text-center text-ink-400 text-sm">
           <span>&copy; 2026 Jalmitra — Vionix initiative.</span>
-          <a href="https://github.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-white transition">
-            <Github className="w-4 h-4" /> GitHub
-          </a>
         </div>
       </footer>
     </div>

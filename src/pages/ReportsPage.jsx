@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FileText, ArrowLeft, Database, Sparkles, Download, CheckSquare, Square, FileJson, FileSpreadsheet } from "lucide-react";
+import { FileText, ArrowLeft, Database, Sparkles, Download, CheckSquare, Square, FileJson, FileSpreadsheet, Info } from "lucide-react";
 import { api } from "../services/api";
-import { ALL_STATES, KERALA_DISTRICTS, AVAILABLE_YEARS } from "../config/constants";
+import { AVAILABLE_YEARS } from "../config/constants";
+import { useStates, useDistricts } from "../hooks/useReferenceData";
 import { useToast } from "../components/common/Toast";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import WaveDivider from "../components/home/WaveDivider";
@@ -24,6 +25,8 @@ export default function ReportsPage() {
 
   const [state, setState] = useState("KERALA");
   const [district, setDistrict] = useState("");
+  const { states } = useStates();
+  const { districts } = useDistricts(state);
   const [years, setYears] = useState(AVAILABLE_YEARS);
 
   // PDF report
@@ -177,7 +180,7 @@ export default function ReportsPage() {
             <label className="text-[11px] font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide block mb-1">State</label>
             <select value={state} onChange={(e) => { setState(e.target.value); setDistrict(""); }}
               className="px-3 py-2 rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-              {ALL_STATES.map((s) => <option key={s} value={s}>{s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
+              {states.map((s) => <option key={s} value={s}>{s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
             </select>
           </div>
           <div>
@@ -185,7 +188,7 @@ export default function ReportsPage() {
             <select value={district} onChange={(e) => setDistrict(e.target.value)}
               className="px-3 py-2 rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
               <option value="">Whole state</option>
-              {state === "KERALA" && KERALA_DISTRICTS.map((d) => <option key={d} value={d}>{d.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
+              {districts.map((d) => <option key={d} value={d}>{d.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
             </select>
           </div>
           <div>
@@ -233,6 +236,12 @@ export default function ReportsPage() {
             <p className="text-sm text-ink-500 dark:text-ink-400 mb-3 leading-relaxed">
               The indexed text passages and metadata Jalmitra's chat assistant retrieves from — the same data behind every cited answer.
             </p>
+            <div className="flex items-start gap-2 text-xs bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg p-2.5 mb-3 text-amber-800 dark:text-amber-300 leading-relaxed">
+              <Info size={14} className="shrink-0 mt-0.5" />
+              <span>
+                The Pinecone semantic layer is disabled on the hosted demo — its embedding model exceeds the 512&nbsp;MB free-tier memory limit, so this export returns data only when the backend is self-hosted with <code className="font-mono">PINECONE_ACTIVATION=true</code>. See the <button type="button" onClick={() => navigate('/documentation#deployment')} className="underline font-medium">docs</button> for details.
+              </span>
+            </div>
             {pineconePreview && (
               <details className="mb-3 text-xs bg-ink-50 dark:bg-ink-900 rounded-lg p-3">
                 <summary className="cursor-pointer font-medium text-ink-600 dark:text-ink-300">Preview a sample record</summary>

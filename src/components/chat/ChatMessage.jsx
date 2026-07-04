@@ -11,8 +11,20 @@ Chart.register(...registerables);
 // (but leave list items, headings, tables and existing blank lines alone).
 function normalizeMarkdown(text) {
   if (!text) return text;
-  return text
-    .replace(/\r\n/g, "\n")
+  let t = text.replace(/\r\n/g, "\n");
+
+  // The model frequently emits list items *inline* on one line, separated by
+  // " * " or " - " instead of newlines (e.g. "metrics: * **Availability**: ...
+  // * **Recharge**: ..."). Markdown then renders the markers as literal
+  // asterisks/dashes inside a paragraph. Promote an inline bullet marker to a
+  // real list line when it is a lone "*" or "-" surrounded by spaces, sitting
+  // mid-line (preceded by a non-space char) and introducing a bold label — the
+  // model's list-item style. Anchoring on the trailing "**" keeps this away from
+  // **bold**, *italic*, hyphenated words (semi-critical) and ranges (70-90%).
+  // (Capture the preceding char instead of a lookbehind for older-Safari support.)
+  t = t.replace(/(\S) +[*-] +(?=\*\*)/g, "$1\n- ");
+
+  return t
     .replace(/\n{3,}/g, "\n\n")
     .replace(/([^\n])\n(?!\n|[-*+]\s|\d+\.\s|#{1,6}\s|\|)/g, "$1\n\n");
 }

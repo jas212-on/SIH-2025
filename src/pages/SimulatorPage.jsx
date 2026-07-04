@@ -7,7 +7,7 @@ import {
   Sparkles, ClipboardList, Droplets, ShieldAlert, Info,
 } from "lucide-react";
 import { api } from "../services/api";
-import { ALL_STATES } from "../config/constants";
+import { useStates } from "../hooks/useReferenceData";
 import { useToast } from "../components/common/Toast";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import WaveDivider from "../components/home/WaveDivider";
@@ -32,6 +32,7 @@ export default function SimulatorPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [state, setState] = useState("KERALA");
+  const { states } = useStates();
   const [draftChangePct, setDraftChangePct] = useState(-15);
   const [horizon, setHorizon] = useState(5);
   const [result, setResult] = useState(null);
@@ -133,7 +134,7 @@ export default function SimulatorPage() {
             <label className="text-[11px] font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide block mb-1">State</label>
             <select value={state} onChange={(e) => setState(e.target.value)}
               className="px-3 py-2 rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 text-ink-800 dark:text-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-              {ALL_STATES.map((s) => <option key={s} value={s}>{s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
+              {states.map((s) => <option key={s} value={s}>{s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
             </select>
           </div>
           <div className="min-w-[220px]">

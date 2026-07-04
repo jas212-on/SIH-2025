@@ -86,9 +86,6 @@ export const api = {
   generateReport: (state, district, years = [2023, 2024]) =>
     fetch(`${BASE}/api/v1/reports/${encodeURIComponent(state)}${district ? `/${encodeURIComponent(district)}` : ""}?years=${years.join(",")}`),
 
-  satellite: (state, year = 2024) =>
-    request(`/api/v1/satellite/${encodeURIComponent(state)}?year=${year}`),
-
   dataFreshness: () => request("/api/v1/data/freshness"),
 
   dataCategories: () => request("/api/v1/data/categories"),
