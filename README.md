@@ -6,7 +6,7 @@
 
 ## What is Jalmitra?
 
-**Jalmitra** (जलमित्र — "friend of water") makes India's groundwater data — published annually by the **Central Ground Water Board (CGWB)** as dense, specialist-only assessments — accessible to anyone through plain-language conversation. This repository is the React interface: everything a user sees and clicks, from the landing page through chat, mapping, forecasting, and farmer advisory tools, talking to the [Jalmitra backend](../SIHb-2025) over a REST/SSE API.
+**Jalmitra** (जलमित्र — "friend of water") makes India's groundwater data — published annually by the **Central Ground Water Board (CGWB)** as dense, specialist-only assessments — accessible to anyone through plain-language conversation. This repository is the React interface: everything a user sees and clicks, from the landing page through chat, mapping, forecasting, and farmer advisory tools, talking to the [Jalmitra backend](../Jalmitra_Backend) over a REST/SSE API.
 
 ### Why it exists
 
@@ -60,12 +60,13 @@ The UI is explicitly role-aware — the same chat box and the same data change s
 ### 1. Prerequisites
 
 - Node.js 20+
-- Backend running at `http://localhost:8000` (see `../SIHb-2025/README.md`)
+- Backend running at `http://localhost:8000` (see `../Jalmitra_Backend/README.md`)
 
 ### 2. Install
 
 ```bash
-cd SIH-2025
+git clone https://github.com/jas212-on/Jalmitra_Frontend.git
+cd Jalmitra_Frontend
 npm install
 ```
 
@@ -165,7 +166,7 @@ The image is nginx + static files with SPA fallback (`try_files $uri /index.html
 
 ### Vercel (recommended for frontend)
 
-1. Import the `SIH-2025` folder as a Vercel project
+1. Import the `Jalmitra_Frontend` repository as a Vercel project
 2. Set `VITE_API_URL` in **Project Settings → Environment Variables**
 3. Deploy — Vercel handles Vite builds automatically
 

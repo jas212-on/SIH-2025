@@ -7,10 +7,10 @@ Thanks for your interest in improving Jalmitra's frontend. This guide covers loc
 1. Fork and clone the repository.
 2. Install dependencies:
    ```bash
-   cd SIH-2025
+   cd Jalmitra_Frontend
    npm install
    ```
-3. Copy the environment template and point it at a running backend (see `../SIHb-2025/README.md`):
+3. Copy the environment template and point it at a running backend (see `../Jalmitra_Backend/README.md`):
    ```bash
    cp .env.example .env
    ```

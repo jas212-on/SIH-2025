@@ -14,13 +14,13 @@ We aim to acknowledge reports within **72 hours** and to provide a resolution ti
 
 ## Scope
 
-This policy covers the `SIH-2025` frontend application, including:
+This policy covers the `Jalmitra_Frontend` frontend application, including:
 
 - Client-side vulnerabilities (XSS, insecure data handling, dependency vulnerabilities)
 - Exposure of secrets or sensitive configuration in the built bundle
 - Authentication/authorization issues in frontend-to-backend communication
 
-Vulnerabilities in the backend (`SIHb-2025`) should be reported per that repository's `SECURITY.md`.
+Vulnerabilities in the backend (`Jalmitra_Backend`) should be reported per that repository's `SECURITY.md`.
 
 ## Supported Versions
 
