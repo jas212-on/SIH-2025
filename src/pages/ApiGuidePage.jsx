@@ -37,7 +37,7 @@ const ENDPOINT_GROUPS = [
       { method: 'GET', path: '/api/v1/data/categories', desc: 'Available data categories for full export.' },
       { method: 'POST', path: '/api/v1/data/export', desc: 'Filtered CSV export for a comparison.' },
       { method: 'GET', path: '/api/v1/data/export-full', desc: 'Full dataset export (JSON or CSV) for a state/district/year range.' },
-      { method: 'GET', path: '/api/v1/data/pinecone-export', desc: 'Export the semantic-search corpus for a state. Returns an empty list on the hosted demo — Pinecone is disabled there; see Documentation → Deployment & Hosting.' },
+      { method: 'GET', path: '/api/v1/data/pinecone-export', desc: 'Export the semantic-search corpus for a state. Returns an empty list unless the backend is self-hosted with PINECONE_ACTIVATION=true (disabled on the hosted demo — see Documentation → Deployment & Hosting).' },
     ],
   },
   {
@@ -77,7 +77,7 @@ const ENDPOINT_GROUPS = [
     group: 'System',
     endpoints: [
       { method: 'GET', path: '/', desc: 'API metadata.' },
-      { method: 'GET', path: '/health', desc: 'Liveness check. Reports Neo4j as up/down, and Pinecone as up/down/disabled (disabled by default in production).' },
+      { method: 'GET', path: '/health', desc: 'Liveness check. Reports Neo4j as up/down, and Pinecone as up/down/disabled — controlled by the PINECONE_ACTIVATION env var (false by default in production).' },
     ],
   },
 ];
