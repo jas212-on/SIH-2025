@@ -202,7 +202,7 @@ export default function ChatPage() {
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <div
               title="Jalmitra's dataset currently covers a limited set of states and years (2023–2024, district-level detail for Kerala only). Some queries may return incomplete or unavailable data."
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-soft"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-rose-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-soft"
             >
               <AlertTriangle size={14} className="shrink-0" />
               <span className="hidden sm:inline">Limited data coverage</span>
@@ -212,7 +212,7 @@ export default function ChatPage() {
             <button
               onClick={() => navigate('/map')}
               title="Open the interactive groundwater map of India"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition"
             >
               <Map size={14} />
               <span className="hidden sm:inline">{t('nav.map')}</span>
@@ -220,7 +220,7 @@ export default function ChatPage() {
             <button
               onClick={() => navigate('/visualization')}
               title="Build charts and visualize groundwater datasets"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition"
             >
               <BarChart3 size={14} />
               <span className="hidden sm:inline">{t('nav.visualize')}</span>
