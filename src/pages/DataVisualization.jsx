@@ -43,7 +43,7 @@ const DataVisualization = ({ onBack }) => {
   const [chartData, setChartData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
   const chartRef = useRef(null);
 
 
@@ -289,10 +289,18 @@ const DataVisualization = ({ onBack }) => {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Mobile backdrop */}
+        {showFilters && (
+          <div
+            onClick={() => setShowFilters(false)}
+            className="fixed inset-0 bg-ink-950/50 z-40 lg:hidden"
+          />
+        )}
+
         {/* Sidebar Filters */}
         {showFilters && (
-          <div className="w-80 bg-white dark:bg-ink-900 border-r border-ink-100 dark:border-ink-800 flex flex-col shrink-0">
+          <div className="fixed lg:static inset-y-0 left-0 z-50 w-80 h-full bg-white dark:bg-ink-900 border-r border-ink-100 dark:border-ink-800 flex flex-col shrink-0 shadow-2xl lg:shadow-none">
             <div className="p-6 space-y-6 overflow-y-auto scrollbar-thin">
               {/* Chart Type Selection */}
               <div>
